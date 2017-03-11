@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+      http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+    <secured attributes="ROLE_ANONYMOUS, ROLE_USER" match="any"/>
+
+    <var name="userLab" class="cat.tecnocampus.domain.UserLab" />
+
+    <decision-state id="isLogged">
+        <if test="securityService.findLoggedInUsername().equals('anonymous')"
+        then="registerUser"
+        else ="lookupUser" />
+    </decision-state>
+
+    <action-state id="lookupUser">
+        <evaluate expression="userUseCases.getUser(securityService.findLoggedInUsername())"
+                  result="userLab"/>
+        <transition on-exception="cat.tecnocampus.exceptions.UserLabNotFoundException" to="registerUser"/>
+        <transition to="userReady"/>
+    </action-state>
+
+    <view-state id="registerUser" model="userLab" view="enterNotesFlow/identifyUserFlow/userform">
+        <transition on="usernameEntered" to="saveUser"/>
+        <transition on="login" to="loginUser"/>
+    </view-state>
+
+    <action-state id="saveUser">
+        <evaluate expression="userUseCases.registerUser(userLab)"/>
+        <transition on-exception="cat.tecnocampus.exceptions.UserLabUsernameAlreadyExistsException" to="registerUser"/>
+        <transition to="saveSecurityUser"/>
+    </action-state>
+
+    <action-state id="saveSecurityUser">
+        <evaluate expression="userSecurityRepository.save(requestParameters.username,requestParameters.password)"/>
+        <transition to="loginUser"/>
+    </action-state>
+
+    <action-state id="loginUser">
+        <evaluate expression="securityService.login(requestParameters.username,requestParameters.password)"/>
+        <transition to="userReady"/>
+    </action-state>
+
+    <end-state id="userReady">
+        <on-entry>
+            <evaluate expression="userLab.name==null? userUseCases.getUser(securityService.findLoggedInUsername()): userLab" result="userLab"/>
+        </on-entry>
+        <output name="userLab"/>
+    </end-state>
+
+    <end-state id="cancel"/>
+
+    <global-transitions>
+        <transition on="cancel" to="cancel" validate="false"></transition>
+    </global-transitions>
+</flow>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css"
+          th:href="@{style.css}"/>
+    <title>New note</title>
+</head>
+<body>
+
+
+<h1> <span th:text="'Create note for ' +  ${user}"/></h1>
+
+<form method="POST" th:object="${noteLab}" >
+
+    <input type="text" th:field="*{title}" /><br/>
+
+    <input type="text" th:field="*{content}" /><br/>
+
+
+    <input type="submit" value="Create Note"/>
+
+</form>
+
+
+</body>
+</html>

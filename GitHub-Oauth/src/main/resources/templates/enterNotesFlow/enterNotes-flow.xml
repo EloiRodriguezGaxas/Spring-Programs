@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow
+      http://www.springframework.org/schema/webflow/spring-webflow-2.4.xsd">
+
+    <secured  attributes="ROLE_ANONYMOUS, ROLE_USER" match="any"/>
+
+    <var name="userLab" class="cat.tecnocampus.domain.UserLab" />
+    <var name="bagNoteLab" class="cat.tecnocampus.domain.BagNoteLab" />
+
+    <subflow-state id="identifyUser" subflow="enterNotesFlow/identifyUserFlow">
+        <output name="userLab"/>
+        <transition on="userReady" to="enterNotes"/>
+    </subflow-state>
+
+    <subflow-state id="enterNotes" subflow="enterNotesFlow/writeNotesFlow">
+        <input name="userLab" value="userLab"/>
+        <output name="bagNoteLab"/>
+        <transition on="finish" to="goodBye"/>
+    </subflow-state>
+
+    <view-state id="goodBye" view="enterNotesFlow/showUserFinish">
+        <transition on="proceed" to="saveBag"/>
+    </view-state>
+
+    <action-state id="saveBag">
+        <evaluate expression="userUseCases.addBag(userLab,bagNoteLab)"/>
+        <transition to="endState"/>
+    </action-state>
+
+
+    <end-state id="endState" view="externalRedirect:contextRelative:/users/#{userLab.username}"/>
+    <end-state id="cancel" view="externalRedirect:/canceledFlow.html"/>
+
+    <global-transitions>
+        <transition on="cancel" to="cancel"></transition>
+    </global-transitions>
+</flow>

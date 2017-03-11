@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow xmlns="http://www.springframework.org/schema/webflow"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow-2.0.xsd">
+
+    <secured attributes="ROLE_USER"/>
+
+    <input name="userLab" required="true"/>
+
+    <on-start>
+        <evaluate result="flowScope.bagNoteLab" expression="new cat.tecnocampus.domain.BagNoteLab()"/>
+    </on-start>
+
+    <view-state id="showNotes" view="enterNotesFlow/writeNotesFlow/showUserBag">
+        <transition on="enterNote" to="createNote"/>
+        <transition on="finishedNotes" to="finish"/>
+        <transition on="cancel" to="cancel"/>
+    </view-state>
+
+    <view-state id="createNote" view="enterNotesFlow/writeNotesFlow/noteForm" model="noteLab">
+        <on-entry>
+            <set name="flowScope.noteLab" value="new cat.tecnocampus.domain.NoteLab()"/>
+        </on-entry>
+        <transition on="noteEntered" to="showNotes">
+            <evaluate expression="bagNoteLab.addNote(flowScope.noteLab)"/>
+        </transition>
+        <transition on="finishedNotes" to="finish"/>
+    </view-state>
+
+    <end-state id="finish">
+        <output name="bagNoteLab"/>
+    </end-state>
+
+    <end-state id="cancel"/>
+
+    <global-transitions>
+        <transition on="cancel" to="cancel"></transition>
+    </global-transitions>
+
+</flow>

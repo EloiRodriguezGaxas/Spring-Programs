@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css"
+          th:href="@{style.css}"/>
+    <title>Create User</title>
+</head>
+<body>
+
+
+<h1> <span th:text="${userLab.name} + ' ' + ${userLab.secondName}"/></h1>
+
+<form method="POST" th:object="${noteLab}" th:action="${flowExecutionUrl}">
+
+    <input type="text" th:field="*{title}" /><br/>
+
+    <input type="text" th:field="*{content}" /><br/>
+
+
+    <input type="submit" value="Create Note" name="_eventId_noteEntered" />
+    <input type="submit" value="Finish Entering Notes" name="_eventId_finishedNotes" />
+    <input type="submit" value="Cancel" name="_eventId_cancel"/>
+
+</form>
+
+
+<h1>Bag of notes</h1>
+<ul>
+    <li th:each="note : ${bagNoteLab.Notes}"
+        th:id="'note_' + ${note.title}">
+        <div th:text="${note.title}">Note title</div>
+        <div th:text="${note.dateEdit}">Edit date</div>
+        <div th:text="${note.content}">Content</div>
+    </li>
+</ul>
+
+
+</body>
+</html>
