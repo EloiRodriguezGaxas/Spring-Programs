@@ -1,0 +1,19 @@
+server:
+  port: 8091
+spring:
+  datasource:
+    url: jdbc:h2:mem:notes
+  application:
+    name: notes
+  profiles:
+    active: memory
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: aish
+          group: consumers-aish
+          # uncomment below to have this module consume from a specific partition
+          # in the range of 0 to N-1, where N is the upstream module's partitionCount
+          #consumerProperties:
+          #  partitionIndex: 1
